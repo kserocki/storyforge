@@ -39,3 +39,7 @@ pnpm-debug.log*
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# Local AI tooling & learning progress (private)
+.claude/
+.learning/
