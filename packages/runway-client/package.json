@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "tsx scripts/demo.ts",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "clip": "tsx scripts/generate-clip.ts"
   },
   "dependencies": {
     "zod": "^4.6.6"

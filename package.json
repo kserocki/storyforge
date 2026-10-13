@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "typecheck": "pnpm -r typecheck",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "clip": "pnpm --filter @storyforge/runway-client clip"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
