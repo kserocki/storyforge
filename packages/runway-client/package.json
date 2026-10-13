@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx src/demo.ts",
+    "dev": "tsx scripts/demo.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },

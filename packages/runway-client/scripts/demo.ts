@@ -1,7 +1,7 @@
 import path from "node:path";
 import { ZodError } from "zod";
-import { describeTask, parseTask, type Task } from "./task.js";
-import {loadEnv} from "./env.js";
+import { describeTask, parseTask, type Task } from "../src/task/task.js";
+import {loadEnv} from "../src/config/env.js";
 
 const tasks: Task[] = [
     { id: "t1", createdAt: "2026-10-12T10:00:00Z", status: "THROTTLED" },
@@ -23,7 +23,7 @@ try {
     else throw err;
 }
 
-// Resolved from this file (src/ → runway-client → packages → repo root), not from the CWD.
+// Resolved from this file (scripts/ → runway-client → packages → repo root), not from the CWD.
 process.loadEnvFile(path.resolve(import.meta.dirname, "../../..", ".env"));
 const env = loadEnv();
 
