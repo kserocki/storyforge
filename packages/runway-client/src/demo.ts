@@ -1,3 +1,4 @@
+import path from "node:path";
 import { ZodError } from "zod";
 import { describeTask, parseTask, type Task } from "./task.js";
 import {loadEnv} from "./env.js";
@@ -22,8 +23,8 @@ try {
     else throw err;
 }
 
-// Relative to the CWD: pnpm --filter runs scripts inside packages/runway-client.
-process.loadEnvFile("../../.env");
+// Resolved from this file (src/ → runway-client → packages → repo root), not from the CWD.
+process.loadEnvFile(path.resolve(import.meta.dirname, "../../..", ".env"));
 const env = loadEnv();
 
 console.log(env);
