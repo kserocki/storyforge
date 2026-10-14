@@ -1,4 +1,4 @@
-import {z} from "zod";
+import { z } from "zod";
 
 // Fields shared by every task variant.
 const TaskBase = z.object({
@@ -7,17 +7,17 @@ const TaskBase = z.object({
 });
 
 export const TaskSchema = z.discriminatedUnion("status", [
-    TaskBase.extend({status: z.literal("PENDING")}),
-    TaskBase.extend({status: z.literal("THROTTLED")}),
-    TaskBase.extend({status: z.literal("RUNNING")}),
-    TaskBase.extend({status: z.literal("SUCCEEDED"), output: z.array(z.string())}),
+    TaskBase.extend({ status: z.literal("PENDING") }),
+    TaskBase.extend({ status: z.literal("THROTTLED") }),
+    TaskBase.extend({ status: z.literal("RUNNING") }),
+    TaskBase.extend({ status: z.literal("SUCCEEDED"), output: z.array(z.string()) }),
     TaskBase.extend({
         status: z.literal("FAILED"),
         failure: z.string(),
-        failureCode: z.string().optional()
+        failureCode: z.string().optional(),
     }),
-    TaskBase.extend({status: z.literal("CANCELED")}),
-])
+    TaskBase.extend({ status: z.literal("CANCELED") }),
+]);
 
 export type TaskBase = z.infer<typeof TaskBase>;
 export type Task = z.infer<typeof TaskSchema>;

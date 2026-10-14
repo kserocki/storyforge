@@ -9,14 +9,14 @@
 
 ## What it does
 
-Type a brief like *"20-second ad for new headphones, neon city at night, cyberpunk mood"* and Storyforge:
+Type a brief like _"20-second ad for new headphones, neon city at night, cyberpunk mood"_ and Storyforge:
 
 1. **Breaks it into shots** with an LLM (structured output: description, camera move, duration).
 2. **Locks consistency** — one reference frame and a shared style/product lock carried across every shot, so separately generated clips still look like one ad.
 3. **Lays the shots out as a node graph** — Brief → Shots → Keyframe → Clip → Final cut — with live progress on each node.
 4. **Generates a keyframe per shot**, then turns each keyframe into a short clip via the [Runway API](https://docs.dev.runwayml.com/).
 5. **Stitches** the clips into one video.
-6. **Edits surgically by chat** — *"make shot 3 a close-up, warmer light"* changes only that node, and **only that shot regenerates**.
+6. **Edits surgically by chat** — _"make shot 3 a close-up, warmer light"_ changes only that node, and **only that shot regenerates**.
 
 ## Why it's interesting to build
 
@@ -29,14 +29,14 @@ Video generation APIs are asynchronous, take minutes per clip and are tightly co
 
 ## Stack
 
-| Area | Tech |
-|---|---|
-| Web | React, Vite, TypeScript, React Flow, TanStack Query |
-| API & worker | Node.js, TypeScript, Fastify, zod |
-| Data | PostgreSQL, Drizzle |
-| AI | Runway API (image & image-to-video), Gemini via Vercel AI SDK |
-| Media | ffmpeg |
-| Infra | AWS (ECS Fargate, RDS, S3, CloudFront), Terraform, GitHub Actions (OIDC) |
+| Area         | Tech                                                                     |
+| ------------ | ------------------------------------------------------------------------ |
+| Web          | React, Vite, TypeScript, React Flow, TanStack Query                      |
+| API & worker | Node.js, TypeScript, Fastify, zod                                        |
+| Data         | PostgreSQL, Drizzle                                                      |
+| AI           | Runway API (image & image-to-video), Gemini via Vercel AI SDK            |
+| Media        | ffmpeg                                                                   |
+| Infra        | AWS (ECS Fargate, RDS, S3, CloudFront), Terraform, GitHub Actions (OIDC) |
 
 ## Roadmap
 

@@ -1,7 +1,7 @@
-import {RetryOptions, withRetry} from "../http/retry.js";
-import {isTerminalTask, Task} from "./task.js";
-import {VideoProvider} from "../providers/provider.js";
-import {sleep} from "../http/sleep.js";
+import { type RetryOptions, withRetry } from "../http/retry.js";
+import { isTerminalTask, type Task } from "./task.js";
+import { type VideoProvider } from "../providers/provider.js";
+import { sleep } from "../http/sleep.js";
 
 export interface PollOptions {
     intervalMs?: number;
@@ -33,7 +33,7 @@ export class TaskFailedError extends Error {
         super(
             task.status === "FAILED"
                 ? `Task ${task.id} failed: ${task.failureCode ?? "UNKNOWN"} ${task.failure}`
-                : `Task ${task.id} was canceled`
+                : `Task ${task.id} was canceled`,
         );
         this.name = "TaskFailedError";
     }
@@ -47,10 +47,14 @@ export interface WaitOptions extends PollOptions {
 export async function waitForTask(provider: VideoProvider, id: string, options: WaitOptions): Promise<SucceededTask> {
     const { timeoutMs, onUpdate, ...pollOptions } = options;
 
-    const timeout = new AbortController()
-    const timer = timeoutMs === undefined
-        ? undefined
-        : setTimeout(() => timeout.abort(new DOMException(`Task ${id} timed out after ${timeoutMs} ms`, "TimeoutError")), timeoutMs);
+    const timeout = new AbortController();
+    const timer =
+        timeoutMs === undefined
+            ? undefined
+            : setTimeout(
+                  () => timeout.abort(new DOMException(`Task ${id} timed out after ${timeoutMs} ms`, "TimeoutError")),
+                  timeoutMs,
+              );
     const signal = options.signal ? AbortSignal.any([options.signal, timeout.signal]) : timeout.signal;
 
     try {

@@ -8,14 +8,22 @@ function jsonResponse(body: unknown): Response {
 }
 
 function providerWith(fetchFn: typeof fetch) {
-    return new RunwayProvider({ apiKey: "key_test", apiVersion: "2024-11-06", baseUrl: "https://runway.test", fetchFn });
+    return new RunwayProvider({
+        apiKey: "key_test",
+        apiVersion: "2024-11-06",
+        baseUrl: "https://runway.test",
+        fetchFn,
+    });
 }
 
 describe("RunwayProvider", () => {
     it("POSTs /v1/image_to_video with defaults", async () => {
         const fetchFn = vi.fn<typeof fetch>(async () => jsonResponse({ id: "task_1", extra: true }));
 
-        const result = await providerWith(fetchFn).startImageToVideo({ promptImage: "https://x/img.jpg", promptText: "neon city" });
+        const result = await providerWith(fetchFn).startImageToVideo({
+            promptImage: "https://x/img.jpg",
+            promptText: "neon city",
+        });
 
         expect(result).toEqual({ id: "task_1" });
         const [url, init] = fetchFn.mock.calls[0]!;
@@ -37,7 +45,12 @@ describe("RunwayProvider", () => {
 
     it("GETs /v1/tasks/{id} and parses the task", async () => {
         const fetchFn = vi.fn<typeof fetch>(async () =>
-            jsonResponse({ id: "a/b", createdAt: "2026-10-12T10:00:00Z", status: "SUCCEEDED", output: ["https://x/clip.mp4"] }),
+            jsonResponse({
+                id: "a/b",
+                createdAt: "2026-10-12T10:00:00Z",
+                status: "SUCCEEDED",
+                output: ["https://x/clip.mp4"],
+            }),
         );
 
         const task = await providerWith(fetchFn).getTask("a/b");

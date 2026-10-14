@@ -7,20 +7,22 @@ export const jobStatus = pgEnum("job_status", [
     "waiting_provider",
     "succeeded",
     "failed",
-    "cancelled"
+    "cancelled",
 ]);
 
-const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
+const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
 
 export const storyboards = pgTable("storyboards", {
     id: uuid("id").primaryKey().defaultRandom(),
     brief: text("brief").notNull(),
     createdAt: createdAt(),
-})
+});
 
 export const shots = pgTable("shots", {
     id: uuid("id").primaryKey().defaultRandom(),
-    storyboardId: uuid("storyboard_id").notNull().references(() => storyboards.id, { onDelete: "cascade" }),
+    storyboardId: uuid("storyboard_id")
+        .notNull()
+        .references(() => storyboards.id, { onDelete: "cascade" }),
     position: integer("position").notNull(),
     prompt: text("prompt").notNull(),
     durationS: integer("duration_s").notNull(),
@@ -57,7 +59,7 @@ export const jobs = pgTable(
     (t) => [index("jobs_status_run_after_idx").on(t.status, t.runAfter)],
 );
 
-export type Storyboard = typeof storyboards.$inferSelect
-export type Shot = typeof shots.$inferSelect
-export type Job = typeof jobs.$inferSelect
-export type NewJob = typeof jobs.$inferInsert
+export type Storyboard = typeof storyboards.$inferSelect;
+export type Shot = typeof shots.$inferSelect;
+export type Job = typeof jobs.$inferSelect;
+export type NewJob = typeof jobs.$inferInsert;

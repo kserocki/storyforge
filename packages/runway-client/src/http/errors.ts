@@ -1,7 +1,7 @@
 export class RunwayApiError extends Error {
     constructor(
         readonly status: number,
-        readonly body: string
+        readonly body: string,
     ) {
         super(`Runway API error ${status}: ${body.slice(0, 200)}`);
         this.name = "RunwayApiError";

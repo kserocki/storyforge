@@ -47,11 +47,19 @@ describe("pollTask / waitForTask", () => {
         await vi.advanceTimersByTimeAsync(60_000);
 
         await expect(p).resolves.toMatchObject({ status: "SUCCEEDED", output: ["https://cdn/x.mp4"] });
-        expect(onUpdate.mock.calls.map(([t]) => t.status)).toEqual(["PENDING", "THROTTLED", "RUNNING", "RUNNING", "SUCCEEDED"]);
+        expect(onUpdate.mock.calls.map(([t]) => t.status)).toEqual([
+            "PENDING",
+            "THROTTLED",
+            "RUNNING",
+            "RUNNING",
+            "SUCCEEDED",
+        ]);
     });
 
     it("throws TaskFailedError for FAILED", async () => {
-        const fake = new FakeRunwayProvider({ failWith: { failure: "bad output", failureCode: "INTERNAL.BAD_OUTPUT" } });
+        const fake = new FakeRunwayProvider({
+            failWith: { failure: "bad output", failureCode: "INTERNAL.BAD_OUTPUT" },
+        });
         const { id } = await fake.startImageToVideo(input);
 
         const p = waitForTask(fake, id, noJitter);
@@ -66,7 +74,10 @@ describe("pollTask / waitForTask", () => {
         const fake = new FakeRunwayProvider({ flakyGetTask: 2 });
         const { id } = await fake.startImageToVideo(input);
 
-        const p = waitForTask(fake, id, { ...noJitter, retry: { maxAttempts: 3, baseMs: 100, maxMs: 1000, random: () => 0 } });
+        const p = waitForTask(fake, id, {
+            ...noJitter,
+            retry: { maxAttempts: 3, baseMs: 100, maxMs: 1000, random: () => 0 },
+        });
         await vi.advanceTimersByTimeAsync(60_000);
 
         await expect(p).resolves.toMatchObject({ status: "SUCCEEDED" });

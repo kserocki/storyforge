@@ -1,12 +1,18 @@
 import path from "node:path";
 import { ZodError } from "zod";
 import { describeTask, parseTask, type Task } from "../src/task/task.js";
-import {loadEnv} from "../src/config/env.js";
+import { loadEnv } from "../src/config/env.js";
 
 const tasks: Task[] = [
     { id: "t1", createdAt: "2026-10-12T10:00:00Z", status: "THROTTLED" },
     { id: "t2", createdAt: "2026-10-12T10:00:00Z", status: "SUCCEEDED", output: ["https://example.com/clip.mp4"] },
-    { id: "t3", createdAt: "2026-10-12T10:00:00Z", status: "FAILED", failure: "Prompt rejected", failureCode: "SAFETY.INPUT.TEXT" },
+    {
+        id: "t3",
+        createdAt: "2026-10-12T10:00:00Z",
+        status: "FAILED",
+        failure: "Prompt rejected",
+        failureCode: "SAFETY.INPUT.TEXT",
+    },
 ];
 for (const task of tasks) {
     console.log(`${task.id}: ${describeTask(task)}`);

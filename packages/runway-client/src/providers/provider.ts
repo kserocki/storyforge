@@ -1,4 +1,4 @@
-import {Task} from "../task/task.js";
+import { type Task } from "../task/task.js";
 
 export interface ImageToVideoInput {
     promptImage: string; // url / uri
@@ -10,5 +10,6 @@ export interface ImageToVideoInput {
 
 export interface VideoProvider {
     startImageToVideo(input: ImageToVideoInput, signal?: AbortSignal): Promise<{ id: string }>;
+
     getTask(id: string, signal?: AbortSignal): Promise<Task>;
 }

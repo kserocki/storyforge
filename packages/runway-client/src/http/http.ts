@@ -1,9 +1,9 @@
-import {RunwayApiError} from "./errors.js";
+import { RunwayApiError } from "./errors.js";
 
 export interface RunwayHttpConfig {
     apiKey: string;
-    apiVersion: string;          // "2024-11-06"
-    baseUrl?: string;            // default "https://api.dev.runwayml.com"
+    apiVersion: string; // "2024-11-06"
+    baseUrl?: string; // default "https://api.dev.runwayml.com"
     fetchFn?: typeof fetch;
 }
 
@@ -14,10 +14,10 @@ export const DEFAULT_RUNWAY_BASE_URL = "https://api.dev.runwayml.com";
 export async function runwayFetch(
     config: RunwayHttpConfig,
     path: string, // e.g. "/v1/tasks/abc"
-    init?: { method?: "GET" | "POST" | "DELETE"; body?: unknown; signal?: AbortSignal }
+    init?: { method?: "GET" | "POST" | "DELETE"; body?: unknown; signal?: AbortSignal },
 ): Promise<unknown> {
-    const fetchFn = config.fetchFn ?? fetch
-    const url = new URL(path, config.baseUrl ?? DEFAULT_RUNWAY_BASE_URL)
+    const fetchFn = config.fetchFn ?? fetch;
+    const url = new URL(path, config.baseUrl ?? DEFAULT_RUNWAY_BASE_URL);
 
     const headers: Record<string, string> = {
         Authorization: `Bearer ${config.apiKey}`,
@@ -30,7 +30,7 @@ export async function runwayFetch(
         method: init?.method ?? "GET",
         headers,
         body: init?.body === undefined ? undefined : JSON.stringify(init.body),
-        signal: init?.signal
+        signal: init?.signal,
     });
 
     if (!res.ok) {

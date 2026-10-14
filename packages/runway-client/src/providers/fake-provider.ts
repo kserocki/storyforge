@@ -1,7 +1,7 @@
-import {randomUUID} from "node:crypto";
-import {RunwayApiError} from "../http/errors.js";
-import type {ImageToVideoInput, VideoProvider} from "./provider.js";
-import type {Task, TaskStatus} from "../task/task.js";
+import { randomUUID } from "node:crypto";
+import { RunwayApiError } from "../http/errors.js";
+import type { ImageToVideoInput, VideoProvider } from "./provider.js";
+import type { Task, TaskStatus } from "../task/task.js";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -43,15 +43,15 @@ export class FakeRunwayProvider implements VideoProvider {
     async startImageToVideo(input: ImageToVideoInput, signal?: AbortSignal): Promise<{ id: string }> {
         signal?.throwIfAborted();
         const id = randomUUID();
-        this.tasks.set(id, {id, createdAt: new Date().toISOString(), input, step: 0});
-        return {id}
+        this.tasks.set(id, { id, createdAt: new Date().toISOString(), input, step: 0 });
+        return { id };
     }
 
     async getTask(id: string, signal?: AbortSignal): Promise<Task> {
         signal?.throwIfAborted();
         if (this.flakyLeft > 0) {
             this.flakyLeft--;
-            throw new RunwayApiError(503, "Fake: Service unavailable")
+            throw new RunwayApiError(503, "Fake: Service unavailable");
         }
 
         const state = this.tasks.get(id);
@@ -67,11 +67,11 @@ export class FakeRunwayProvider implements VideoProvider {
         const base = { id: state.id, createdAt: state.createdAt };
         const { failWith } = this.options;
         if (status === "FAILED" || (status === "SUCCEEDED" && failWith)) {
-            return { ...base, status: "FAILED", ...(failWith ?? { failure: "Fake: Simulated failure"})};
+            return { ...base, status: "FAILED", ...(failWith ?? { failure: "Fake: Simulated failure" }) };
         }
 
         if (status === "SUCCEEDED") {
-            return { ...base, status, output: [this.options.outputUrl ?? DEFAULT_FAKE_OUTPUT_URL ]};
+            return { ...base, status, output: [this.options.outputUrl ?? DEFAULT_FAKE_OUTPUT_URL] };
         }
 
         return { ...base, status };

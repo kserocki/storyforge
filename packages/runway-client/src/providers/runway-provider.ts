@@ -1,9 +1,9 @@
-import {z} from "zod";
-import {ImageToVideoInput, VideoProvider} from "./provider.js";
-import {runwayFetch, RunwayHttpConfig} from "../http/http.js";
-import {parseTask, Task} from "../task/task.js";
+import { z } from "zod";
+import { type ImageToVideoInput, type VideoProvider } from "./provider.js";
+import { runwayFetch, type RunwayHttpConfig } from "../http/http.js";
+import { parseTask, type Task } from "../task/task.js";
 
-const StartResponse = z.object({id: z.string()});
+const StartResponse = z.object({ id: z.string() });
 
 export class RunwayProvider implements VideoProvider {
     constructor(private readonly config: RunwayHttpConfig) {}
@@ -20,7 +20,7 @@ export class RunwayProvider implements VideoProvider {
                 ratio: input.ratio ?? "1280:720",
                 duration: input.duration ?? 5,
             },
-            signal
+            signal,
         });
         return StartResponse.parse(json);
     }

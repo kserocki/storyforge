@@ -13,7 +13,7 @@ export interface DownloadOptions {
 
 export async function downloadToFile(url: string, destPath: string, options: DownloadOptions = {}): Promise<void> {
     const parsed = new URL(url);
-    await mkdir(path.dirname(destPath), {recursive: true});
+    await mkdir(path.dirname(destPath), { recursive: true });
 
     if (parsed.protocol === "file:") {
         await copyFile(fileURLToPath(parsed), destPath);
@@ -24,16 +24,14 @@ export async function downloadToFile(url: string, destPath: string, options: Dow
         throw new Error(`Unsupported protocol: ${parsed.protocol}`);
     }
 
-    const res = await (options.fetchFn ?? fetch)(parsed, { signal: options.signal})
+    const res = await (options.fetchFn ?? fetch)(parsed, { signal: options.signal });
     if (!res.ok || !res.body) {
-        throw new Error(`Download failed: HTTP ${res.status} for ${parsed.origin}${parsed.pathname}`)
+        throw new Error(`Download failed: HTTP ${res.status} for ${parsed.origin}${parsed.pathname}`);
     }
     try {
-        await pipeline(
-            Readable.fromWeb(res.body as NodeWebReadableStream<Uint8Array>),
-            createWriteStream(destPath),
-            { signal: options.signal }
-        );
+        await pipeline(Readable.fromWeb(res.body as NodeWebReadableStream<Uint8Array>), createWriteStream(destPath), {
+            signal: options.signal,
+        });
     } catch (error) {
         await rm(destPath, { force: true });
         throw error;

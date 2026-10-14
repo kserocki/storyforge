@@ -2,7 +2,7 @@ export interface BackoffOptions {
     baseMs: number;
     maxMs: number;
     jitterRatio?: number;
-    random?: () => number
+    random?: () => number;
 }
 
 export function computeBackoff(attempt: number, options: BackoffOptions): number {

@@ -10,11 +10,11 @@ import {
     type VideoProvider,
 } from "../src/index.js";
 
-const repoRoot = path.resolve(import.meta.dirname, "../../..")
+const repoRoot = path.resolve(import.meta.dirname, "../../..");
 process.loadEnvFile(path.join(repoRoot, ".env"));
 const env = loadEnv();
 
-const { values} = parseArgs({
+const { values } = parseArgs({
     options: {
         prompt: { type: "string" },
         image: { type: "string" },
@@ -32,12 +32,13 @@ if (values.duration !== "5" && values.duration !== "10") {
     process.exit(1);
 }
 
-const duration = values.duration === "10" ? 10 : 5
-const provider: VideoProvider = env.PROVIDER === "runway"
-    ? new RunwayProvider({ apiKey: env.RUNWAY_API_KEY!, apiVersion: env.RUNWAY_API_VERSION })
-    : new FakeRunwayProvider();
+const duration = values.duration === "10" ? 10 : 5;
+const provider: VideoProvider =
+    env.PROVIDER === "runway"
+        ? new RunwayProvider({ apiKey: env.RUNWAY_API_KEY!, apiVersion: env.RUNWAY_API_VERSION })
+        : new FakeRunwayProvider();
 
-const intervalMs = env.PROVIDER === "runway" ? 5000 : 500
+const intervalMs = env.PROVIDER === "runway" ? 5000 : 500;
 const ac = new AbortController();
 process.on("SIGINT", () => ac.abort(new Error("SIGINT")));
 
@@ -51,7 +52,7 @@ try {
     console.log(`Provider: ${env.PROVIDER}`);
     const { id } = await provider.startImageToVideo(
         { promptImage: values.image, promptText: values.prompt, duration },
-        ac.signal
+        ac.signal,
     );
     console.log(`[${elapsed()}] started task ${id}`);
 
@@ -60,13 +61,13 @@ try {
         timeoutMs: 10 * 60_000,
         signal: ac.signal,
         onUpdate: (t) => console.log(`[${elapsed()}] ${t.status}`),
-    })
+    });
 
-    const dest = path.join(repoRoot, "tmp", "clips", `${task.id}.mp4`)
+    const dest = path.join(repoRoot, "tmp", "clips", `${task.id}.mp4`);
     await downloadToFile(task.output[0]!, dest, { signal: ac.signal });
 
     console.log(`[${elapsed()}] saved ${path.relative(process.cwd(), dest)}`);
-    console.log(dest)
+    console.log(dest);
 } catch (err) {
     if (ac.signal.aborted) {
         console.error("Canceled");

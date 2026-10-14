@@ -9,12 +9,12 @@ export function sleep(ms: number, signal?: AbortSignal): Promise<void> {
         const onAbort = () => {
             clearTimeout(timer);
             reject(signal!.reason);
-        }
+        };
 
         const timer = setTimeout(() => {
             signal?.removeEventListener("abort", onAbort);
             resolve();
         }, ms);
-        signal?.addEventListener("abort", onAbort, { once: true })
-    })
+        signal?.addEventListener("abort", onAbort, { once: true });
+    });
 }
