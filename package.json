@@ -5,7 +5,10 @@
   "scripts": {
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
-    "clip": "pnpm --filter @storyforge/runway-client clip"
+    "clip": "pnpm --filter @storyforge/runway-client clip",
+    "db:up": "docker compose -f infra/docker-compose.yml up -d --wait",
+    "db:down": "docker compose -f infra/docker-compose.yml down",
+    "db:psql": "docker exec -it storyforge-db psql -U storyforge"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
