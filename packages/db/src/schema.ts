@@ -1,14 +1,8 @@
+import { JOB_KINDS, JOB_STATUSES } from "@storyforge/shared";
 import { index, integer, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
-export const jobKind = pgEnum("job_kind", ["keyframe", "clip", "stitch"]);
-export const jobStatus = pgEnum("job_status", [
-    "queued",
-    "running",
-    "waiting_provider",
-    "succeeded",
-    "failed",
-    "cancelled",
-]);
+export const jobKind = pgEnum("job_kind", JOB_KINDS);
+export const jobStatus = pgEnum("job_status", JOB_STATUSES);
 
 const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
 
