@@ -1,6 +1,7 @@
 import path from "node:path";
 import { parseArgs } from "node:util";
 import {
+    downloadToFile,
     FakeRunwayProvider,
     loadEnv,
     RunwayProvider,
@@ -60,7 +61,12 @@ try {
         signal: ac.signal,
         onUpdate: (t) => console.log(`[${elapsed()}] ${t.status}`),
     })
-    console.log(`[${elapsed()}] finished task ${task.output[0]}`);
+
+    const dest = path.join(repoRoot, "tmp", "clips", `${task.id}.mp4`)
+    await downloadToFile(task.output[0]!, dest, { signal: ac.signal });
+
+    console.log(`[${elapsed()}] saved ${path.relative(process.cwd(), dest)}`);
+    console.log(dest)
 } catch (err) {
     if (ac.signal.aborted) {
         console.error("Canceled");

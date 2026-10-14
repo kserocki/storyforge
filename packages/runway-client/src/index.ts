@@ -9,3 +9,4 @@ export * from "./task/poll.js";
 export * from "./providers/fake-provider.js";
 export * from "./providers/provider.js";
 export * from "./providers/runway-provider.js";
+export * from "./download/download.js";

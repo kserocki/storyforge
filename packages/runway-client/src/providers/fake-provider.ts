@@ -2,6 +2,8 @@ import {randomUUID} from "node:crypto";
 import {RunwayApiError} from "../http/errors.js";
 import type {ImageToVideoInput, VideoProvider} from "./provider.js";
 import type {Task, TaskStatus} from "../task/task.js";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 export interface FakeRunwayProviderOptions {
     /** Status returned by each consecutive getTask; the last one repeats. */
@@ -14,7 +16,11 @@ export interface FakeRunwayProviderOptions {
 }
 
 export const DEFAULT_FAKE_SCRIPT: TaskStatus[] = ["PENDING", "THROTTLED", "RUNNING", "RUNNING", "SUCCEEDED"];
-export const DEFAULT_FAKE_OUTPUT_URL = "https://example.com/fake-clip.mp4"; // will be replaced later
+
+// <repo root>/tmp/fake-clip.mp4 — this file lives in packages/runway-client/src/providers.
+export const DEFAULT_FAKE_OUTPUT_URL = pathToFileURL(
+    path.resolve(import.meta.dirname, "../../../../tmp/fake-clip.mp4"),
+).href;
 
 interface FakeTaskState {
     id: string;
