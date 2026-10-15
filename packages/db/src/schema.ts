@@ -9,6 +9,8 @@ const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull(
 export const storyboards = pgTable("storyboards", {
     id: uuid("id").primaryKey().defaultRandom(),
     brief: text("brief").notNull(),
+    // Image every clip starts from (until per-shot keyframes exist). Nullable: old rows have none.
+    referenceImageUrl: text("reference_image_url"),
     createdAt: createdAt(),
 });
 

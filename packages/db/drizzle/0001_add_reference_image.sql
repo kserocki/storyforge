@@ -1,0 +1,1 @@
+ALTER TABLE "storyboards" ADD COLUMN "reference_image_url" text;
