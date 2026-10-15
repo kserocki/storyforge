@@ -43,3 +43,8 @@ export function allowedFrom(event: JobEvent): readonly JobStatus[] {
 export function isTerminalJobStatus(status: JobStatus): boolean {
     return status === "succeeded" || status === "failed" || status === "cancelled";
 }
+
+/** Status a job ends up in after `event` (regardless of where it started) */
+export function eventTarget(event: JobEvent): JobStatus {
+    return TRANSITIONS[event].to;
+}
