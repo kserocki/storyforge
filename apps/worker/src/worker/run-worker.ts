@@ -12,6 +12,7 @@ import type { Logger } from "../logger/logger.js";
 import type { JobKind } from "@storyforge/shared";
 import { type BackoffOptions, computeBackoff, sleep } from "@storyforge/runway-client";
 import { Semaphore } from "../semaphore/semaphore.js";
+import { classifyError } from "../error/classify-error.js";
 
 export interface JobContext {
     db: Db;
@@ -37,17 +38,16 @@ export interface RunWorkerOptions {
     concurrency: number;
     idleMs: number;
     staleAfterMs: number;
-    // Decides retry vs permanent failure
+    // Decides retry vs permanent failure (default: classifyError)
     classify?: (err: unknown) => FailureClassification;
     retryBackoff?: BackoffOptions;
 }
 
 const DEFAULT_RETRY_BACKOFF: BackoffOptions = { baseMs: 5_000, maxMs: 5 * 60_000 };
-const retryEverything = (err: unknown): FailureClassification => ({ retryable: true, message: String(err) });
 
 export async function runWorker(options: RunWorkerOptions): Promise<void> {
     const { db, workerId, handlers, log, signal, idleMs, staleAfterMs } = options;
-    const classify = options.classify ?? retryEverything;
+    const classify = options.classify ?? classifyError;
     const retryBackoff = options.retryBackoff ?? DEFAULT_RETRY_BACKOFF;
     const kinds = Object.keys(handlers) as JobKind[];
     const slots = new Semaphore(options.concurrency);

@@ -12,7 +12,7 @@
         "format": "prettier --write .",
         "format:check": "prettier --check .",
         "worker": "pnpm --filter @storyforge/worker start",
-        "ftt": "pnpm format && pnpm -r typecheck && pnpm -r test"
+        "check": "pnpm format && pnpm -r typecheck && pnpm -r test"
     },
     "devDependencies": {
         "@types/node": "^26.6.5",
