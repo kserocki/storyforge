@@ -25,6 +25,14 @@ export function classifyError(err: unknown): FailureClassification {
     // wrong shape of object which we don't understand, and we have a bug :(
     if (err instanceof ZodError) return { retryable: false, message: err.message };
     if (err instanceof InvalidTransitionError) return { retryable: false, message: err.message };
+    if (err instanceof PermanentJobError) return { retryable: false, message: err.message };
 
     return { retryable: true, message: err instanceof Error ? `${err.name}: ${err.message}` : String(err) };
+}
+
+export class PermanentJobError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "PermanentJobError";
+    }
 }
