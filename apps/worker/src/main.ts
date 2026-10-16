@@ -2,6 +2,7 @@ import * as path from "node:path";
 import { loadWorkerConfig } from "./config.js";
 import { createLogger } from "./logger.js";
 import { createDb, pingDb } from "@storyforge/db";
+import { runWorker } from "./run-worker.js";
 
 const repoRoot = path.resolve(import.meta.dirname, "../../..");
 process.loadEnvFile(path.join(repoRoot, ".env"));
@@ -22,8 +23,16 @@ for (const signal of ["SIGINT", "SIGTERM"] as const) {
 try {
     await pingDb(db);
     log("worker_started", { provider: config.PROVIDER, concurrency: config.WORKER_CONCURRENCY });
-    // TODO: runWorker function
-    await new Promise<void>((resolve) => shutdown.signal.addEventListener("abort", () => resolve(), { once: true }));
+    await runWorker({
+        db: db,
+        workerId: config.WORKER_ID,
+        handlers: {},
+        log: log,
+        signal: shutdown.signal,
+        concurrency: config.WORKER_CONCURRENCY,
+        idleMs: config.IDLE_POLL_MS,
+        staleAfterMs: config.STALE_AFTER_MS,
+    });
 } finally {
     await close();
     log("worker_stopped");
