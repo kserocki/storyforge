@@ -10,7 +10,9 @@
         "db:down": "docker compose -f infra/docker-compose.yml down",
         "db:psql": "docker exec -it storyforge-db psql -U storyforge",
         "format": "prettier --write .",
-        "format:check": "prettier --check ."
+        "format:check": "prettier --check .",
+        "worker": "pnpm --filter @storyforge/worker start",
+        "ftt": "pnpm format && pnpm -r typecheck && pnpm -r test"
     },
     "devDependencies": {
         "@types/node": "^26.6.5",
