@@ -1,6 +1,6 @@
 import { type Job, jobs } from "../schema.js";
 import type { Db } from "../client.js";
-import { and, asc, eq, inArray, lte, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, lt, lte, sql } from "drizzle-orm";
 import type { PgUpdateSetSource } from "drizzle-orm/pg-core";
 import type { JobKind } from "@storyforge/shared";
 import { allowedFrom, eventTarget, type JobEvent } from "@storyforge/shared";
@@ -111,4 +111,27 @@ export async function heartbeat(db: Db, jobId: string, workerId: string): Promis
         )
         .returning({ id: jobs.id });
     if (rows.length === 0) throw new LostJobError(jobId, "release");
+}
+
+/** Graceful shutdown: hand the job back untouched (provider_task_id stays, so the next worker resumes polling). */
+export function releaseJob(db: Db, jobId: string, workerId: string): Promise<Job> {
+    return transition(db, jobId, workerId, "release", { ...unlocked, runAfter: sql`now()` });
+}
+
+/**
+ * Crash recovery: active jobs whose lock wasn't refreshed (heartbeat) for `staleAfterMs` belong to a dead
+ * worker → back to the queue. The attempt it used is NOT refunded: a job that keeps killing workers
+ * must eventually hit max_attempts instead of looping forever ("poison message").
+ */
+export async function requeueStaleJobs(db: Db, staleAfterMs: number): Promise<Job[]> {
+    return db
+        .update(jobs)
+        .set({ ...unlocked, status: eventTarget("release"), runAfter: sql`now()` })
+        .where(
+            and(
+                inArray(jobs.status, [...allowedFrom("release")]),
+                lt(jobs.lockedAt, sql`now() - make_interval(secs => ${staleAfterMs / 1000})`),
+            ),
+        )
+        .returning();
 }
