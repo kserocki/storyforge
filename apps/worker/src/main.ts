@@ -1,8 +1,8 @@
 import * as path from "node:path";
-import { loadWorkerConfig } from "./config.js";
-import { createLogger } from "./logger.js";
+import { loadWorkerConfig } from "./config/config.js";
+import { createLogger } from "./logger/logger.js";
 import { createDb, pingDb } from "@storyforge/db";
-import { runWorker } from "./run-worker.js";
+import { runWorker } from "./worker/run-worker.js";
 
 const repoRoot = path.resolve(import.meta.dirname, "../../..");
 process.loadEnvFile(path.join(repoRoot, ".env"));

@@ -8,10 +8,10 @@ import {
     releaseJob,
     requeueStaleJobs,
 } from "@storyforge/db";
-import type { Logger } from "./logger.js";
+import type { Logger } from "../logger/logger.js";
 import type { JobKind } from "@storyforge/shared";
 import { type BackoffOptions, computeBackoff, sleep } from "@storyforge/runway-client";
-import { Semaphore } from "./semaphore.js";
+import { Semaphore } from "../semaphore/semaphore.js";
 
 export interface JobContext {
     db: Db;
