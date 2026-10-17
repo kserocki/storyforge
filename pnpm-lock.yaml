@@ -21,6 +21,22 @@ importers:
         specifier: ^7.0.2
         version: 7.0.2
 
+  apps/cli:
+    dependencies:
+      '@storyforge/planner':
+        specifier: workspace:*
+        version: link:../../packages/planner
+      '@storyforge/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
+    devDependencies:
+      vitest:
+        specifier: ^5.0.4
+        version: 5.0.4(@types/node@26.6.5)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(tsx@4.23.15))
+
   apps/worker:
     dependencies:
       '@storyforge/db':
