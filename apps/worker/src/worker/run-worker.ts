@@ -1,5 +1,6 @@
 import {
     claimNextJob,
+    claimNextJobWithinLimit,
     type Db,
     type Job,
     LostJobError,
@@ -9,7 +10,7 @@ import {
     requeueStaleJobs,
 } from "@storyforge/db";
 import type { Logger } from "../logger/logger.js";
-import type { JobKind } from "@storyforge/shared";
+import { type JobKind, PROVIDER_JOB_KINDS } from "@storyforge/shared";
 import { type BackoffOptions, computeBackoff, sleep } from "@storyforge/runway-client";
 import { Semaphore } from "../semaphore/semaphore.js";
 import { classifyError } from "../error/classify-error.js";
@@ -40,6 +41,8 @@ export interface RunWorkerOptions {
     staleAfterMs: number;
     // Decides retry vs permanent failure (default: classifyError)
     classify?: (err: unknown) => FailureClassification;
+    // Global cap on active provider jobs across all workers (Runway tier). Unset = no cap
+    providerConcurrency?: number;
     retryBackoff?: BackoffOptions;
 }
 
@@ -95,7 +98,15 @@ export async function runWorker(options: RunWorkerOptions): Promise<void> {
             break;
         }
 
-        const job = await claimNextJob(db, workerId, { kinds });
+        const job =
+            options.providerConcurrency === undefined
+                ? await claimNextJob(db, workerId, { kinds })
+                : await claimNextJobWithinLimit(
+                      db,
+                      workerId,
+                      { providerKinds: PROVIDER_JOB_KINDS, max: options.providerConcurrency },
+                      { kinds },
+                  );
         if (!job) {
             release();
             await sleep(idleMs, signal).catch(() => {});

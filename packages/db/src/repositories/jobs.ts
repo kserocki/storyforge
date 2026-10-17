@@ -1,16 +1,15 @@
 import { type Job, jobs } from "../schema.js";
-import type { Db } from "../client.js";
-import { and, asc, eq, inArray, lt, lte, sql } from "drizzle-orm";
+import type { Db, DbOrTx } from "../client.js";
+import { and, asc, count, eq, inArray, lt, lte, sql } from "drizzle-orm";
 import type { PgUpdateSetSource } from "drizzle-orm/pg-core";
-import type { JobKind } from "@storyforge/shared";
-import { allowedFrom, eventTarget, type JobEvent } from "@storyforge/shared";
+import { allowedFrom, eventTarget, JOB_KINDS, type JobEvent, type JobKind } from "@storyforge/shared";
 
 export interface ClaimOptions {
     /** Only claim jobs of these kinds (default: any kind). */
     kinds?: readonly JobKind[];
 }
 
-export async function claimNextJob(db: Db, workerId: string, options: ClaimOptions = {}): Promise<Job | undefined> {
+export async function claimNextJob(db: DbOrTx, workerId: string, options: ClaimOptions = {}): Promise<Job | undefined> {
     const runnable = and(
         eq(jobs.status, "queued"),
         lte(jobs.runAfter, sql`now()`),
@@ -134,4 +133,50 @@ export async function requeueStaleJobs(db: Db, staleAfterMs: number): Promise<Jo
             ),
         )
         .returning();
+}
+
+export interface ProviderLimit {
+    providerKinds: readonly JobKind[];
+    // max jobs running across all workers - depends on tier limit
+    max: number;
+}
+
+// Any constant works; it just has to be the same number in every worker.
+const PROVIDER_SLOTS_LOCK = 4_242_001;
+
+/**
+ * claimNextJob, but never lets more than `limit.max` provider jobs be active across all workers.
+ *
+ * "Count, then claim" is a race: two workers both count 0 and both claim. pg_advisory_xact_lock
+ * makes the count+claim pair a critical section for every worker (released at COMMIT) — a
+ * distributed mutex that costs nothing but a few ms per claim.
+ */
+export async function claimNextJobWithinLimit(
+    db: Db,
+    workerId: string,
+    limit: ProviderLimit,
+    options: ClaimOptions = {},
+): Promise<Job | undefined> {
+    return db.transaction(async (tx) => {
+        await tx.execute(sql`SELECT pg_advisory_xact_lock(${PROVIDER_SLOTS_LOCK})`);
+
+        const [row] = await tx
+            .select({ active: count() })
+            .from(jobs)
+            .where(
+                and(
+                    inArray(jobs.kind, [...limit.providerKinds]),
+                    inArray(jobs.status, ["running", "waiting_provider"]),
+                ),
+            );
+
+        let kinds = options.kinds;
+        if ((row?.active ?? 0) >= limit.max) {
+            // provider is full, only non-provider work may start now e.g. stitch
+            kinds = (kinds ?? JOB_KINDS).filter((k) => !limit.providerKinds.includes(k));
+            if (kinds.length === 0) return undefined;
+        }
+
+        return claimNextJob(tx, workerId, { kinds });
+    });
 }

@@ -49,6 +49,29 @@ describe("runWorker", () => {
         expect(peak).toBe(2);
     });
 
+    it("respects the global provider limit even with free local slots", async () => {
+        await insertJobs(db, 4);
+        let running = 0;
+        let peak = 0;
+
+        const worker = start({
+            concurrency: 3,
+            providerConcurrency: 1,
+            handlers: {
+                clip: async () => {
+                    running++;
+                    peak = Math.max(peak, running);
+                    await new Promise((r) => setTimeout(r, 20));
+                    running--;
+                },
+            },
+        });
+        await waitFor(async () => (await allJobs()).every((j) => j.status === "succeeded"));
+        await worker.stop();
+
+        expect(peak).toBe(1);
+    });
+
     it("retries a failing job and marks it failed after max attempts", async () => {
         await insertJobs(db, 1, "clip", 3);
         let calls = 0;

@@ -42,6 +42,7 @@ try {
         concurrency: config.WORKER_CONCURRENCY,
         idleMs: config.IDLE_POLL_MS,
         staleAfterMs: config.STALE_AFTER_MS,
+        providerConcurrency: config.PROVIDER_CONCURRENCY,
     });
 } finally {
     await close();
